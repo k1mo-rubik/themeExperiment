@@ -1,26 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Текст №[[${textNumber}]]</title>
-    <style>
-        /* Примерная стилизация тем */
-        body.light-theme {
-            background-color: #ffffff;
-            color: #000000;
-        }
-        body.dark-theme {
-            background-color: #333333;
-            color: #ffffff;
-        }
-    </style>
+<html xmlns:th="http://www.thymeleaf.org" >
+<head th:replace="~{fragments/head :: head}">
+    <title th:text="'Текст №' + ${textNumber}">Текст</title>
 </head>
 <body th:class="${themeClass}">
-<h1>Текст [[${textNumber}]]</h1>
-<div th:text="${textContent}"></div>
-
-<form th:action="@{/experiment/{textNumber}/next(textNumber=${textNumber}, userId=${userId})}" method="post">
-    <input type="hidden" name="startTime" th:value="${startTime}"/>
-    <button type="submit">Далее</button>
-</form>
+<div style="margin: 0 15%; text-align: center;">
+    <h1 class="mb-4">Текст №<span th:text="${textNumber}"></span></h1>
+    <div class="lead mb-4" th:text="${textContent}"></div>
+    <form th:action="@{/experiment/{textNumber}/next(textNumber=${textNumber}, userId=${userId})}" method="post">
+        <input type="hidden" name="startTime" th:value="${startTime}"/>
+        <button type="submit" class="btn btn-success btn-lg">Далее</button>
+    </form>
+</div>
 </body>
 </html>

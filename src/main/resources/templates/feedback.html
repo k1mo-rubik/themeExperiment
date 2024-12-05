@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
+<html xmlns:th="http://www.thymeleaf.org" >
+<head th:replace="~{fragments/head :: head}">
     <title>Обратная связь</title>
 </head>
 <body>
-<h1>Оставьте ваш отзыв об эксперименте</h1>
-<form th:action="@{/feedback}" method="post">
-    <input type="hidden" name="userId" th:value="${userId}"/>
-    <textarea name="feedbackText" rows="5" cols="50"></textarea><br>
-    <button type="submit">Отправить</button>
-</form>
+<div style="margin: 0 15%; text-align: center;">
+    <h1 class="mb-3">Оставьте ваш отзыв об эксперименте</h1>
+    <form th:action="@{/feedback}" method="post">
+        <input type="hidden" name="userId" th:value="${userId}"/>
+        <div class="mb-3">
+            <textarea class="form-control" name="feedbackText" rows="5" placeholder="Напишите ваш отзыв..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Отправить</button>
+    </form>
+</div>
 </body>
 </html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}">
+    <title>Админка</title>
+    <style>
+        .correct-row {
+            background-color: #d4edda; /* светло-зеленый фон */
+        }
+        .incorrect-row {
+            background-color: #f8d7da; /* светло-красный фон */
+        }
+    </style>
+</head>
+<body>
+<div style="margin: 0 15%; text-align:center;">
+    <h1>Результаты пользователей</h1>
+    <table class="table table-bordered table-striped mt-4">
+        <thead>
+        <tr>
+            <th>Пользователь</th>
+            <th>Пол</th>
+            <th>Возраст</th>
+            <th>Текст ID</th>
+            <th>Время чтения (мс)</th>
+            <th>Правильных ответов</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${results}"
+            th:class="${r.correctAnswersCount == 2} ? 'correct-row' : 'incorrect-row'">
+            <td th:text="${userMap[r.userId].nickname}"></td>
+            <td th:text="${userMap[r.userId].gender}"></td>
+            <td th:text="${userMap[r.userId].age}"></td>
+            <td th:text="${r.textId}"></td>
+            <td th:text="${r.readingTimeMillis}"></td>
+            <td th:text="${r.correctAnswersCount}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

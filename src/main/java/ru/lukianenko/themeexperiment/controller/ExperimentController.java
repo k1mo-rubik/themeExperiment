@@ -19,7 +19,10 @@ import ru.lukianenko.themeexperiment.repo.TextRepository;
 import ru.lukianenko.themeexperiment.repo.UserRepository;
 import ru.lukianenko.themeexperiment.repo.UserTextResultRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class ExperimentController {
@@ -64,22 +67,18 @@ public class ExperimentController {
 
     @GetMapping("/experiment/{textNumber}")
     public String showText(
-        @PathVariable int textNumber,
-        @RequestParam Long userId,
-        Model model
+            @PathVariable int textNumber,
+            @RequestParam Long userId,
+            Model model
     ) {
         UserDto userDto = userRepo.findById(userId).orElseThrow();
-        
-        // Определяем текст по номеру
-        // Предположим texts: id=1,2 -> A; id=3,4 -> B
-        // или же мы можем заранее зашить соответствие textNumber -> textId
-        Long textId = (long) textNumber;
 
-        TextEntity textEntity = textRepo.findById(textId).orElseThrow();
-        
-        boolean isGroupA = textEntity.getGroupName().equals("A");
+        // Предположим, textNumber соответствует textId
+        TextEntity textEntity = textRepo.findById((long) textNumber).orElseThrow();
+
+        boolean isGroupA = "A".equals(textEntity.getGroupName());
         boolean conditionAIsLight = userDto.isConditionAIsLight();
-        
+
         String themeClass;
         if (isGroupA) {
             themeClass = conditionAIsLight ? "light-theme" : "dark-theme";
@@ -121,6 +120,19 @@ public class ExperimentController {
         @RequestParam Long userId,
         Model model
     ) {
+
+        UserDto userDto = userRepo.findById(userId).orElseThrow();
+        TextEntity textEntity = textRepo.findById((long) textNumber).orElseThrow();
+        boolean isGroupA = textEntity.getGroupName().equals("A");
+        boolean conditionAIsLight = userDto.isConditionAIsLight();
+
+        String themeClass;
+        if (isGroupA) {
+            themeClass = conditionAIsLight ? "light-theme" : "dark-theme";
+        } else {
+            themeClass = conditionAIsLight ? "dark-theme" : "light-theme";
+        }
+        model.addAttribute("themeClass", themeClass);
         List<Question> questions = questionRepo.findByTextId((long) textNumber);
         model.addAttribute("questions", questions);
         model.addAttribute("textNumber", textNumber);
@@ -177,4 +189,92 @@ public class ExperimentController {
         feedbackRepo.save(fb);
         return "thankyou";
     }
+
+    @GetMapping("/api/adminold")
+    public String adminOldPage(Model model) {
+        // Загружаем всех пользователей
+        List<UserDto> users = userRepo.findAll();
+
+        // Загружаем все результаты
+        List<UserTextResult> results = userTextResultRepo.findAll();
+
+        // Создаём Map для быстрого доступа к пользователям по userId
+        Map<Long, UserDto> userMap = new HashMap<>();
+        for (UserDto u : users) {
+            userMap.put(u.getId(), u);
+        }
+
+        model.addAttribute("userMap", userMap);
+        model.addAttribute("results", results);
+
+        return "adminold"; // соответствующий шаблон admin.html
+    }
+
+//    @GetMapping("/api/admin")
+//    public String adminPage(Model model) {
+//        // 1. Загружаем всех пользователей
+//        List<UserDto> users = userRepo.findAll();
+//
+//        // 2. Загружаем все результаты
+//        List<UserTextResult> results = userTextResultRepo.findAll();
+//
+//        // 3. Создаём Map для быстрого доступа к пользователям по userId
+//        Map<Long, UserDto> userMap = users.stream()
+//                .collect(Collectors.toMap(UserDto::getId, u -> u));
+//
+//        // 4. Создаём Map для быстрого доступа к текстам по textId
+//        Map<Long, TextEntity> textMap = textRepo.findAll().stream()
+//                .collect(Collectors.toMap(TextEntity::getId, t -> t));
+//
+//        // 5. Создаём структуры для агрегирования данных
+//        // Map<userId, TotalCorrectAnswers>
+//        Map<Long, Integer> totalCorrectAnswersMap = new HashMap<>();
+//
+//        // Map<userId, CorrectAnswersInLightTheme>
+//        Map<Long, Integer> lightAnswersMap = new HashMap<>();
+//
+//        // Map<userId, CorrectAnswersInDarkTheme>
+//        Map<Long, Integer> darkAnswersMap = new HashMap<>();
+//
+//        for (UserTextResult r : results) {
+//            Long userId = r.getUserId();
+//            Long textId = r.getTextId();
+//            UserDto user = userMap.get(userId);
+//            TextEntity text = textMap.get(textId);
+//
+//            if (user != null && text != null) {
+//                boolean isGroupA = "A".equals(text.getGroupName());
+//                boolean conditionAIsLight = user.isConditionAIsLight();
+//
+//                // Определяем тему для данного текста
+//                boolean isLightTheme;
+//                if (isGroupA) {
+//                    isLightTheme = conditionAIsLight;
+//                } else {
+//                    isLightTheme = !conditionAIsLight;
+//                }
+//
+//                // Агрегируем общее количество правильных ответов
+//                totalCorrectAnswersMap.put(userId,
+//                        totalCorrectAnswersMap.getOrDefault(userId, 0) + r.getCorrectAnswersCount());
+//
+//                // Агрегируем по теме
+//                if (isLightTheme) {
+//                    lightAnswersMap.put(userId,
+//                            lightAnswersMap.getOrDefault(userId, 0) + r.getCorrectAnswersCount());
+//                } else {
+//                    darkAnswersMap.put(userId,
+//                            darkAnswersMap.getOrDefault(userId, 0) + r.getCorrectAnswersCount());
+//                }
+//            }
+//        }
+//
+//        // 6. Добавляем агрегированные данные в модель
+//        model.addAttribute("users", users);
+//        model.addAttribute("totalCorrectAnswersMap", totalCorrectAnswersMap);
+//        model.addAttribute("lightAnswersMap", lightAnswersMap);
+//        model.addAttribute("darkAnswersMap", darkAnswersMap);
+//
+//        return "admin"; // соответствующий шаблон admin.html
+//    }
 }

@@ -1,21 +1,31 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Старт</title>
+<html xmlns:th="http://www.thymeleaf.org" >
+<head th:replace="~{fragments/head :: head}">
+    <title th:replace="this::title">Начало</title>
 </head>
 <body>
-<h1>Введите данные для участия в эксперименте</h1>
-<form action="/start" method="post">
-    <label>Никнейм: <input type="text" name="nickname" required></label><br>
-    <label>Пол:
-        <select name="gender">
-            <option>Мужской</option>
-            <option>Женский</option>
-            <option>Другое</option>
-        </select>
-    </label><br>
-    <label>Возраст: <input type="number" name="age" min="18" max="99"></label><br>
-    <button type="submit">Начать эксперимент</button>
-</form>
+<div style="margin:0 25%; text-align: center;">
+    <h1 class="my-4">Введите данные для участия</h1>
+    <p class="text-muted">Заполните форму ниже, чтобы начать эксперимент.</p>
+    <form th:action="@{/start}" method="post" class="d-flex flex-column gap-3">
+        <div>
+            <label for="nickname" class="form-label">Никнейм</label>
+            <input type="text" class="form-control" id="nickname" name="nickname" required>
+        </div>
+        <div>
+            <label for="gender" class="form-label">Пол</label>
+            <select class="form-select" id="gender" name="gender">
+                <option>Мужской</option>
+                <option>Женский</option>
+                <option>Другое</option>
+            </select>
+        </div>
+        <div>
+            <label for="age" class="form-label">Возраст</label>
+            <input type="number" class="form-control" id="age" name="age" min="18" max="99" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Начать эксперимент</button>
+    </form>
+</div>
 </body>
 </html>

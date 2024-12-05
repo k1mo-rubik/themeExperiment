@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}">
+  <title>Админка</title>
+  <style>
+    .correct-row {
+      background-color: #d4edda; /* светло-зеленый фон */
+    }
+    .incorrect-row {
+      background-color: #f8d7da; /* светло-красный фон */
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+<div style="margin: 0 15%; text-align:center;">
+  <h1 class="mb-4">Результаты пользователей</h1>
+  <div class="table-container">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark">
+      <tr>
+        <th>Пользователь</th>
+        <th>Пол</th>
+        <th>Возраст</th>
+        <th>Всего Правильных</th>
+        <th>Суммарно (светлая тема)</th>
+        <th>Суммарно (тёмная тема)</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="user : ${users}"
+          th:class="${totalCorrectAnswersMap[user.id] == 3} ? 'correct-row' : 'incorrect-row'">
+        <td th:text="${user.nickname}"></td>
+        <td th:text="${user.gender}"></td>
+        <td th:text="${user.age}"></td>
+        <td th:text="${totalCorrectAnswersMap[user.id]}"></td>
+        <td th:text="${lightAnswersMap[user.id] != null ? lightAnswersMap[user.id] : 0}"></td>
+        <td th:text="${darkAnswersMap[user.id] != null ? darkAnswersMap[user.id] : 0}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>
