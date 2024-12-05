@@ -1,16 +1,17 @@
 package ru.lukianenko.themeexperiment.controller;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.lukianenko.themeexperiment.dto.Feedback;
-import ru.lukianenko.themeexperiment.dto.TextEntity;
 import ru.lukianenko.themeexperiment.dto.UserDto;
 import ru.lukianenko.themeexperiment.dto.UserTextResult;
+import ru.lukianenko.themeexperiment.dto.TextEntity;
 import ru.lukianenko.themeexperiment.repo.FeedbackRepository;
-import ru.lukianenko.themeexperiment.repo.TextRepository;
 import ru.lukianenko.themeexperiment.repo.UserRepository;
 import ru.lukianenko.themeexperiment.repo.UserTextResultRepository;
+import ru.lukianenko.themeexperiment.repo.TextRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,8 +51,13 @@ public class AdminController {
                 .collect(Collectors.toMap(TextEntity::getId, t -> t));
 
         // 6. Создаём Map для быстрого доступа к фидбэкам по userId
+        // Если допускаются несколько фидбэков, берём последний или как-то иначе обрабатываем дубликаты
         Map<Long, Feedback> feedbackMap = feedbacks.stream()
-                .collect(Collectors.toMap(Feedback::getUserId, f -> f));
+                .collect(Collectors.toMap(
+                        Feedback::getUserId,
+                        f -> f,
+                        (existing, replacement) -> replacement // Берём последний фидбэк при дубликатах
+                ));
 
         // 7. Создаём структуры для агрегирования данных
         // Map<userId, CorrectAnswersInLightTheme>
@@ -97,12 +103,12 @@ public class AdminController {
             totalCorrectAnswersMap.put(user.getId(), light + dark);
         }
 
-        // 9. Добавляем агрегированные данные и фидбэки в модель
+        // 9. Добавляем все необходимые данные в модель
         model.addAttribute("users", users);
         model.addAttribute("totalCorrectAnswersMap", totalCorrectAnswersMap);
         model.addAttribute("lightAnswersMap", lightAnswersMap);
         model.addAttribute("darkAnswersMap", darkAnswersMap);
-        model.addAttribute("feedbackMap", feedbackMap);
+        model.addAttribute("feedbackMap", feedbackMap); // Добавляем feedbackMap
 
         return "admin"; // соответствующий шаблон admin.html
     }

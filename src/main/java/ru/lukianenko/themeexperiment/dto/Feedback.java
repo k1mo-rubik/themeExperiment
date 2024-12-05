@@ -15,6 +15,7 @@ public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true) // Добавляем уникальное ограничение
     private Long userId;
     @Column(length=2000)
     private String feedbackText;
