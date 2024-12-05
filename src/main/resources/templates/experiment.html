@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Текст №[[${textNumber}]]</title>
+    <style>
+        /* Примерная стилизация тем */
+        body.light-theme {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        body.dark-theme {
+            background-color: #333333;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body th:class="${themeClass}">
+<h1>Текст [[${textNumber}]]</h1>
+<div th:text="${textContent}"></div>
+
+<form th:action="@{/experiment/{textNumber}/next(textNumber=${textNumber}, userId=${userId})}" method="post">
+    <input type="hidden" name="startTime" th:value="${startTime}"/>
+    <button type="submit">Далее</button>
+</form>
+</body>
+</html>

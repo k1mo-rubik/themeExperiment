@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Вопросы по тексту №[[${textNumber}]]</title>
+</head>
+<body>
+<h1>Вопросы по тексту №[[${textNumber}]]</h1>
+<form th:action="@{/experiment/{textNumber}/quiz(textNumber=${textNumber}, userId=${userId})}" method="post">
+    <div th:each="q: ${questions}">
+        <p th:text="${q.questionText}"></p>
+        <label><input type="radio" th:name="${'q' + q.id}" th:value="1" required> <span th:text="${q.option1}"></span></label><br>
+        <label><input type="radio" th:name="${'q' + q.id}" th:value="2" required> <span th:text="${q.option2}"></span></label><br>
+        <label><input type="radio" th:name="${'q' + q.id}" th:value="3" required> <span th:text="${q.option3}"></span></label><br>
+    </div>
+    <button type="submit">Отправить ответы</button>
+</form>
+</body>
+</html>

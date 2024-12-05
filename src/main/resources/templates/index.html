@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Старт</title>
+</head>
+<body>
+<h1>Введите данные для участия в эксперименте</h1>
+<form action="/start" method="post">
+    <label>Никнейм: <input type="text" name="nickname" required></label><br>
+    <label>Пол:
+        <select name="gender">
+            <option>Мужской</option>
+            <option>Женский</option>
+            <option>Другое</option>
+        </select>
+    </label><br>
+    <label>Возраст: <input type="number" name="age" min="18" max="99"></label><br>
+    <button type="submit">Начать эксперимент</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: experimentdb
+      POSTGRES_USER: experimentuser
+      POSTGRES_PASSWORD: experimentpass
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "experimentuser"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: experimentdb
+      DB_USER: experimentuser
+      DB_PASSWORD: experimentpass
+    ports:
+      - "8080:8080"

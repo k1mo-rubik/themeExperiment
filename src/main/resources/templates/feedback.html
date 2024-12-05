@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Обратная связь</title>
+</head>
+<body>
+<h1>Оставьте ваш отзыв об эксперименте</h1>
+<form th:action="@{/feedback}" method="post">
+    <input type="hidden" name="userId" th:value="${userId}"/>
+    <textarea name="feedbackText" rows="5" cols="50"></textarea><br>
+    <button type="submit">Отправить</button>
+</form>
+</body>
+</html>
