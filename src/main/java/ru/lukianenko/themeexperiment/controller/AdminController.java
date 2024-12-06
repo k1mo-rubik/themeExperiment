@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import ru.lukianenko.themeexperiment.dto.Feedback;
 import ru.lukianenko.themeexperiment.dto.UserDto;
 import ru.lukianenko.themeexperiment.dto.UserTextResult;
 import ru.lukianenko.themeexperiment.dto.TextEntity;
+
 import ru.lukianenko.themeexperiment.repo.FeedbackRepository;
-import ru.lukianenko.themeexperiment.repo.UserRepository;
+import ru.lukianenko.themeexperiment.repo.UserDtoRepository;
 import ru.lukianenko.themeexperiment.repo.UserTextResultRepository;
 import ru.lukianenko.themeexperiment.repo.TextRepository;
 
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     @Autowired
-    private UserRepository userRepo;
+    private UserDtoRepository userRepo;
 
     @Autowired
     private UserTextResultRepository userTextResultRepo;
@@ -51,7 +53,7 @@ public class AdminController {
                 .collect(Collectors.toMap(TextEntity::getId, t -> t));
 
         // 6. Создаём Map для быстрого доступа к фидбэкам по userId
-        // Если допускаются несколько фидбэков, берём последний или как-то иначе обрабатываем дубликаты
+        // Если допускаются несколько фидбэков, берём последний
         Map<Long, Feedback> feedbackMap = feedbacks.stream()
                 .collect(Collectors.toMap(
                         Feedback::getUserId,
@@ -73,7 +75,7 @@ public class AdminController {
             TextEntity text = textMap.get(textId);
 
             if (user != null && text != null) {
-                boolean isGroupA = "A".equals(text.getGroupName());
+                boolean isGroupA = "A".equalsIgnoreCase(text.getGroupName());
                 boolean conditionAIsLight = user.isConditionAIsLight();
 
                 // Определяем тему для данного текста
@@ -110,6 +112,6 @@ public class AdminController {
         model.addAttribute("darkAnswersMap", darkAnswersMap);
         model.addAttribute("feedbackMap", feedbackMap); // Добавляем feedbackMap
 
-        return "admin"; // соответствующий шаблон admin.html
+        return "admin"; // соответствует шаблону admin.html
     }
 }

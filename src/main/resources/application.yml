@@ -14,5 +14,11 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+
+  # Logging level for Thymeleaf
+logging:
+  level:
+    org:
+      thymeleaf=DEBUG:
 server:
   port: 8080

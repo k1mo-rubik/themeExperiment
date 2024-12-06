@@ -1,0 +1,209 @@
+<!-- src/main/resources/templates/analytics.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Аналитика</title>
+    <meta charset="UTF-8">
+    <!-- Подключаем Bootstrap и Chart.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="container my-5">
+    <h1 class="text-center mb-4">Статистика Эксперимента</h1>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <canvas id="correctAnswersChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <canvas id="readingTimeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <canvas id="averageMetricsChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <h3>Количество Завершивших Эксперимент: <span th:text="${completedExperimentCount}"></span></h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <canvas id="userCorrectAnswersChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <canvas id="userReadingTimeChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // График правильных ответов по темам
+    var ctx1 = document.getElementById('correctAnswersChart').getContext('2d');
+    var correctAnswersChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: [[${#lists.toList(correctAnswersByTheme.keySet())}]],
+            datasets: [{
+                label: 'Правильные ответы',
+                data: [[${#lists.toList(correctAnswersByTheme.values())}]],
+                backgroundColor: ['#4CAF50', '#FF6384']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Правильные ответы по темам'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    // График времени чтения
+    var ctx2 = document.getElementById('readingTimeChart').getContext('2d');
+    var readingTimeChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: [[${userNames}]],
+            datasets: [{
+                label: 'Время чтения (мс)',
+                data: [[${userReadingTimes}]],
+                backgroundColor: '#36A2EB',
+                borderColor: '#36A2EB',
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Время чтения пользователей'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // График средних метрик
+    var ctx3 = document.getElementById('averageMetricsChart').getContext('2d');
+    var averageMetricsChart = new Chart(ctx3, {
+        type: 'pie',
+        data: {
+            labels: ['Среднее количество правильных ответов'],
+            datasets: [{
+                label: 'Средние метрики',
+                data: [[${averageCorrectAnswers}]],
+                backgroundColor: ['#FFCE56']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Среднее количество правильных ответов'
+                }
+            }
+        }
+    });
+
+    // График правильных ответов по пользователям
+    var ctx4 = document.getElementById('userCorrectAnswersChart').getContext('2d');
+    var userCorrectAnswersChart = new Chart(ctx4, {
+        type: 'bar',
+        data: {
+            labels: [[${userNames}]],
+            datasets: [{
+                label: 'Правильные ответы',
+                data: [[${userCorrectAnswers}]],
+                backgroundColor: '#FF6384'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Правильные ответы пользователей'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    // График времени чтения по пользователям
+    var ctx5 = document.getElementById('userReadingTimeChart').getContext('2d');
+    var userReadingTimeChart = new Chart(ctx5, {
+        type: 'bar',
+        data: {
+            labels: [[${userNames}]],
+            datasets: [{
+                label: 'Время чтения (мс)',
+                data: [[${userReadingTimes}]],
+                backgroundColor: '#36A2EB'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Время чтения пользователей'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

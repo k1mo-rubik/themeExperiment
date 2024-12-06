@@ -1,131 +1,197 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head}">
-  <title>Админка</title>
+  <title>Analytics</title>
+  <!-- Подключение Chart.js через CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .correct-row {
-      background-color: #d4edda; /* светло-зеленый фон */
-    }
-    .incorrect-row {
-      background-color: #f8d7da; /* светло-красный фон */
-    }
-    .table-container {
-      overflow-x: auto;
-    }
-    /* Стили для модального окна */
-    .modal {
-      display: none; /* Скрыто по умолчанию */
-      position: fixed; /* Оставаться на месте */
-      z-index: 1; /* Поверх всего */
-      padding-top: 100px; /* Расстояние сверху */
-      left: 0;
-      top: 0;
-      width: 100%; /* Полная ширина */
-      height: 100%; /* Полная высота */
-      overflow: auto; /* Включить прокрутку, если нужно */
-      background-color: rgb(0,0,0); /* Фон */
-      background-color: rgba(0,0,0,0.4); /* Фон с прозрачностью */
-    }
-
-    /* Стиль модального содержимого */
-    .modal-content {
-      background-color: #fefefe;
-      margin: auto;
-      padding: 20px;
-      border: 1px solid #888;
+    .chart-container {
       width: 80%;
-    }
-
-    /* Стиль кнопки закрытия */
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
+      margin: auto;
+      padding: 20px 0;
     }
   </style>
 </head>
 <body>
-<div style="margin: 0 15%; text-align:center;">
-  <h1 class="mb-4">Результаты пользователей</h1>
-  <div class="table-container">
-    <table class="table table-bordered table-striped">
-      <thead class="table-dark">
-      <tr>
-        <th>Пользователь</th>
-        <th>Пол</th>
-        <th>Возраст</th>
-        <th>Всего Правильных</th>
-        <th>Суммарно (светлая тема)</th>
-        <th>Суммарно (тёмная тема)</th>
-        <th>Эксперимент завершен</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="user : ${users}"
-          th:class="${totalCorrectAnswersMap[user.id] >= 3} ? 'correct-row' : 'incorrect-row'"
-          th:data-feedback="${feedbackMap[user.id]?.feedbackText}"
-          style="cursor: pointer;">
-        <td th:text="${user.nickname}"></td>
-        <td th:text="${user.gender}"></td>
-        <td th:text="${user.age}"></td>
-        <td th:text="${totalCorrectAnswersMap[user.id]}"></td>
-        <td th:text="${lightAnswersMap[user.id] != null ? lightAnswersMap[user.id] : 0}"></td>
-        <td th:text="${darkAnswersMap[user.id] != null ? darkAnswersMap[user.id] : 0}"></td>
-        <td th:text="${feedbackMap.containsKey(user.id) ? 'Да' : 'Нет'}"></td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+<div style="margin: 0 10%; text-align:center;">
+  <h1 class="mb-4">Статистика Эксперимента</h1>
 
-<!-- Модальное окно -->
-<div id="feedbackModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Фидбэк пользователя</h2>
-    <p id="feedbackText"></p>
+  <div class="chart-container">
+    <h3>Количество Правильных Ответов по Пользователям</h3>
+    <canvas id="correctAnswersChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h3>Время Чтения по Пользователям (мс)</h3>
+    <canvas id="readingTimeChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h3>Распределение Правильных Ответов по Темам</h3>
+    <canvas id="answersByThemeChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h3>Среднее Время Чтения</h3>
+    <p th:text="'Среднее время чтения: ' + ${averageReadingTime} + ' мс'"></p>
+  </div>
+
+  <div class="chart-container">
+    <h3>Количество Завершивших Эксперимент</h3>
+    <p th:text="'Завершивших эксперимент: ' + ${completedExperimentCount}"></p>
+  </div>
+
+  <div class="chart-container">
+    <h3>Среднее Количество Правильных Ответов</h3>
+    <p th:text="'Среднее количество правильных ответов: ' + ${averageCorrectAnswers}"></p>
+  </div>
+
+  <div class="chart-container">
+    <h3>Распределение по Возрасту</h3>
+    <canvas id="ageDistributionChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h3>Топ 5 Пользователей по Правильным Ответам</h3>
+    <canvas id="top5UsersChart"></canvas>
   </div>
 </div>
 
 <script>
-  // Получаем модальное окно
-  var modal = document.getElementById("feedbackModal");
+  // Данные для графика "Количество Правильных Ответов по Пользователям"
+  var correctAnswersData = /*[[${correctAnswersPerUser.values().toArray()}]]*/ [];
+  var userNames = /*[[${top5UserNames}]]*/ [];
 
-  // Получаем элемент <span>, который закрывает модальное окно
-  var span = document.getElementsByClassName("close")[0];
-
-  // Получаем все строки таблицы
-  var rows = document.querySelectorAll("table tbody tr");
-
-  rows.forEach(function(row) {
-    row.addEventListener("click", function() {
-      var feedback = this.getAttribute("data-feedback");
-      if (feedback) {
-        document.getElementById("feedbackText").innerText = feedback;
-        modal.style.display = "block";
+  var ctx1 = document.getElementById('correctAnswersChart').getContext('2d');
+  var correctAnswersChart = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: JSON.parse('["' + [[${top5UserNames}]] + '"]'), // Топ 5 пользователей
+      datasets: [{
+        label: 'Правильные Ответы',
+        data: JSON.parse('[' + [[${top5UserAnswers}]] + ']'),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
       }
-    });
+    }
   });
 
-  // Когда пользователь нажимает на <span> (x), закрыть модальное окно
-  span.onclick = function() {
-    modal.style.display = "none";
-  }
+  // Данные для графика "Время Чтения по Пользователям (мс)"
+  var readingTimeData = /*[[${readingTimePerUser.values().toArray()}]]*/ [];
 
-  // Когда пользователь кликает вне модального окна, закрыть его
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
+  var ctx2 = document.getElementById('readingTimeChart').getContext('2d');
+  var readingTimeChart = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: Object.keys(/*[[${readingTimePerUser}]]*/ {}), // Все пользователи
+      datasets: [{
+        label: 'Время Чтения (мс)',
+        data: Object.values(/*[[${readingTimePerUser}]]*/ {}),
+        fill: false,
+        borderColor: 'rgba(153, 102, 255, 1)',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
     }
-  }
+  });
+
+  // Данные для графика "Распределение Правильных Ответов по Темам"
+  var answersByThemeLabels = ['Светлая тема', 'Тёмная тема'];
+  var answersByThemeData = [
+    /*[[${correctAnswersByTheme['Светлая тема']}]]*/ 0,
+    /*[[${correctAnswersByTheme['Тёмная тема']}]]*/ 0
+  ];
+
+  var ctx3 = document.getElementById('answersByThemeChart').getContext('2d');
+  var answersByThemeChart = new Chart(ctx3, {
+    type: 'pie',
+    data: {
+      labels: answersByThemeLabels,
+      datasets: [{
+        data: answersByThemeData,
+        backgroundColor: [
+          'rgba(255, 206, 86, 0.6)',
+          'rgba(255, 99, 132, 0.6)'
+        ],
+        borderColor: [
+          'rgba(255, 206, 86, 1)',
+          'rgba(255, 99, 132, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+
+  // Данные для графика "Распределение по Возрасту"
+  var ageDistributionLabels = /*[[${ageDistribution.keySet()}]]*/ [];
+  var ageDistributionData = /*[[${ageDistribution.values()}]]*/ [];
+
+  var ctx4 = document.getElementById('ageDistributionChart').getContext('2d');
+  var ageDistributionChart = new Chart(ctx4, {
+    type: 'doughnut',
+    data: {
+      labels: JSON.parse('["' + [[${ageDistribution.keySet()}]] + '"]'),
+      datasets: [{
+        data: JSON.parse('[' + [[${ageDistribution.values()}]] + ']'),
+        backgroundColor: [
+          'rgba(54, 162, 235, 0.6)',
+          'rgba(255, 159, 64, 0.6)',
+          'rgba(75, 192, 192, 0.6)',
+          'rgba(153, 102, 255, 0.6)'
+        ],
+        borderColor: [
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 159, 64, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+
+  // Данные для графика "Топ 5 Пользователей по Правильным Ответам"
+  var top5UserNames = /*[[${top5UserNames}]]*/ [];
+  var top5UserAnswers = /*[[${top5UserAnswers}]]*/ [];
+
+  var ctx5 = document.getElementById('top5UsersChart').getContext('2d');
+  var top5UsersChart = new Chart(ctx5, {
+    type: 'bar',
+    data: {
+      labels: JSON.parse('["' + [[${top5UserNames}]] + '"]'),
+      datasets: [{
+        label: 'Правильные Ответы',
+        data: JSON.parse('[' + [[${top5UserAnswers}]] + ']'),
+        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
 </script>
 </body>
 </html>

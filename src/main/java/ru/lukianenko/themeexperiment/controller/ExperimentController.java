@@ -16,19 +16,18 @@ import ru.lukianenko.themeexperiment.dto.UserTextResult;
 import ru.lukianenko.themeexperiment.repo.FeedbackRepository;
 import ru.lukianenko.themeexperiment.repo.QuestionRepository;
 import ru.lukianenko.themeexperiment.repo.TextRepository;
-import ru.lukianenko.themeexperiment.repo.UserRepository;
+import ru.lukianenko.themeexperiment.repo.UserDtoRepository;
 import ru.lukianenko.themeexperiment.repo.UserTextResultRepository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 public class ExperimentController {
 
     @Autowired
-    private UserRepository userRepo;
+    private UserDtoRepository userRepo;
     @Autowired
     private TextRepository textRepo;
     @Autowired
