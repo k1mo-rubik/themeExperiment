@@ -103,11 +103,26 @@ public class ExperimentController {
         long endTime = System.currentTimeMillis();
         long readingTime = endTime - startTime;
 
+        UserDto userDto = userRepo.findById(userId).orElseThrow();
+        // Предположим, textNumber соответствует textId
+        TextEntity textEntity = textRepo.findById((long) textNumber).orElseThrow();
         // Создадим/обновим запись UserTextResult (пока без ответа на вопросы)
         UserTextResult utr = new UserTextResult();
         utr.setUserId(userId);
         utr.setTextId((long)textNumber);
         utr.setReadingTimeMillis(readingTime);
+
+        boolean isGroupA = "A".equals(textEntity.getGroupName());
+        boolean conditionAIsLight = userDto.isConditionAIsLight();
+
+        boolean themeCurr;
+        if (isGroupA) {
+            themeCurr = !conditionAIsLight;
+        } else {
+            themeCurr = conditionAIsLight;
+        }
+        utr.setDarkTheme(themeCurr);
+
         utr = userTextResultRepo.save(utr);
 
         return "redirect:/experiment/" + textNumber + "/quiz?userId=" + userId;

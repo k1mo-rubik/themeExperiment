@@ -16,6 +16,7 @@ public class UserTextResult {
     private Long id;
     private Long userId;
     private Long textId;
-    private long readingTimeMillis; 
+    private long readingTimeMillis;
+    private boolean isDarkTheme;
     private int correctAnswersCount;
 }
