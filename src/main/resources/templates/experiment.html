@@ -1,12 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" >
+<html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head}">
     <title th:text="'Текст №' + ${textNumber}">Текст</title>
+    <style>
+        /*body {*/
+        /*    font-size: 16px;*/
+        /*    font-family: Verdana, sans-serif;*/
+        /*}*/
+    </style>
 </head>
 <body th:class="${themeClass}">
 <div style="margin: 0 15%; text-align: center;">
     <h1 class="mb-4">Текст №<span th:text="${textNumber}"></span></h1>
-    <div class="lead mb-4" th:text="${textContent}"></div>
+    <div class="mb-4" style="font-size: 16px; font-family: Verdana" th:text="${textContent}"></div>
     <form th:action="@{/experiment/{textNumber}/next(textNumber=${textNumber}, userId=${userId})}" method="post">
         <input type="hidden" name="startTime" th:value="${startTime}"/>
         <button type="submit" class="btn btn-success btn-lg">Далее</button>
