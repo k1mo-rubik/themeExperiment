@@ -70,6 +70,8 @@ public class ExperimentController {
             @RequestParam Long userId,
             Model model
     ) {
+        boolean isSwap = textNumber == 3;
+
         UserDto userDto = userRepo.findById(userId).orElseThrow();
 
         // Предположим, textNumber соответствует textId
@@ -81,8 +83,14 @@ public class ExperimentController {
         String themeClass;
         if (isGroupA) {
             themeClass = conditionAIsLight ? "light-theme" : "dark-theme";
+
         } else {
             themeClass = conditionAIsLight ? "dark-theme" : "light-theme";
+
+        }
+        if (isSwap)
+        {
+            themeClass = themeClass.equals("dark-theme") ?themeClass+ " swap-theme-d":themeClass+ " swap-theme-l" ;
         }
 
         model.addAttribute("themeClass", themeClass);
@@ -178,6 +186,8 @@ public class ExperimentController {
         userTextResultRepo.save(utr);
 
         if (textNumber < 4) {
+
+
             return "redirect:/experiment/" + (textNumber+1) + "?userId=" + userId;
         } else {
             return "redirect:/feedback?userId=" + userId;

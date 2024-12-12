@@ -2,12 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head}">
     <title th:text="'Текст №' + ${textNumber}">Текст</title>
-    <style>
-        /*body {*/
-        /*    font-size: 16px;*/
-        /*    font-family: Verdana, sans-serif;*/
-        /*}*/
-    </style>
+    <link rel="stylesheet" href="anim.css">
+
+
 </head>
 <body th:class="${themeClass}">
 <div style="margin: 0 15%; text-align: center;">

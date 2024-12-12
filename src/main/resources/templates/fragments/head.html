@@ -24,5 +24,30 @@
             color: #ffffff;
         }
 
+        @keyframes colorFade {
+            0% {
+                background-color: #333333;
+            }
+            100% {
+                background-color: white;
+            }
+        }
+        @keyframes colorFadeReverse {
+            0% {
+                background-color: white;
+            }
+            100% {
+                background-color: #333333;
+            }
+        }
+        .swap-theme-l {
+            animation:  colorFade 2s;
+        }
+
+
+        .swap-theme-d {
+            animation: colorFadeReverse   2s;
+        }
+
     </style>
 </head>
