@@ -1,7 +1,5 @@
 -- Заполняем таблицу texts
 -- Предполагается, что id генерируется автоматически (IDENTITY или SERIAL), иначе нужно указать id вручную
-DROP table if exists text_entity;
-
 INSERT INTO text_entity (group_name, content)
 VALUES ('A', 'Осенью 1925 года я поступил в Академию наук лаборантом геологического музея.
 
@@ -94,8 +92,6 @@ VALUES ('A', 'Осенью 1925 года я поступил в Академию
 Мне хотелось на миг остановить время, оглянуться на себя, на прожитые годы, вспомнить Женю, лодку, дождик, вспомнить слепоту своей юношеской души, так легко прошедшей мимо того, что могло бы стать судьбой.
 ');
 
--- Вопросы к первому тексту (id=1)
-DROP table if exists question;
 
 INSERT INTO question (text_id, question_text, option1, option2, option3, correct_option_index)
 VALUES
