@@ -3,13 +3,12 @@
 <head th:replace="~{fragments/head :: head}">
     <title th:text="'Текст №' + ${textNumber}">Текст</title>
     <link rel="stylesheet" href="anim.css">
-
-
 </head>
 <body th:class="${themeClass}">
 <div style="margin: 0 15%; text-align: center;">
     <h1 class="mb-4">Текст №<span th:text="${textNumber}"></span></h1>
-    <div class="mb-4" style="font-size: 16px; font-family: Verdana" th:text="${textContent}"></div>
+    <!-- Добавляем text-align: justify для текста -->
+    <div class="mb-4" style="font-size: 16px; font-family: Verdana; text-align: justify;" th:text="${textContent}"></div>
     <form th:action="@{/experiment/{textNumber}/next(textNumber=${textNumber}, userId=${userId})}" method="post">
         <input type="hidden" name="startTime" th:value="${startTime}"/>
         <button type="submit" class="btn btn-success btn-lg">Далее</button>

@@ -70,7 +70,8 @@ public class ExperimentController {
             @RequestParam Long userId,
             Model model
     ) {
-        boolean isSwap = textNumber == 3;
+//        boolean isSwap = textNumber == 3;
+
 
         UserDto userDto = userRepo.findById(userId).orElseThrow();
 
@@ -88,10 +89,7 @@ public class ExperimentController {
             themeClass = conditionAIsLight ? "dark-theme" : "light-theme";
 
         }
-        if (isSwap)
-        {
-            themeClass = themeClass.equals("dark-theme") ?themeClass+ " swap-theme-d":themeClass+ " swap-theme-l" ;
-        }
+
 
         model.addAttribute("themeClass", themeClass);
         model.addAttribute("textNumber", textNumber);
@@ -187,12 +185,28 @@ public class ExperimentController {
 
         if (textNumber < 4) {
 
+            if (textNumber == 2) {
+                return "redirect:/experiment/" + (textNumber+1) + "/transition?userId=" + userId;
+            }
 
             return "redirect:/experiment/" + (textNumber+1) + "?userId=" + userId;
         } else {
             return "redirect:/feedback?userId=" + userId;
         }
     }
+    @GetMapping("/experiment/{textNumber}/transition")
+    public String transitionPage(
+            @PathVariable int textNumber,
+            @RequestParam Long userId,
+            Model model
+    ) {
+        boolean isSwap = textNumber == 3; // Определяем значение isSwap для третьего текста
+        model.addAttribute("isSwap", isSwap);
+        model.addAttribute("userId", userId);
+        model.addAttribute("textNumber", textNumber);
+        return "transition";
+    }
+
 
     @GetMapping("/feedback")
     public String feedback(
@@ -206,13 +220,16 @@ public class ExperimentController {
     @PostMapping("/feedback")
     public String submitFeedback(
             @RequestParam String feedbackText,
-            @RequestParam Long userId) {
+            @RequestParam Long userId,
+            @RequestParam Boolean prefersDarkTheme) {
         Feedback fb = new Feedback();
         fb.setUserId(userId);
         fb.setFeedbackText(feedbackText);
+        fb.setPrefersDarkTheme(prefersDarkTheme); // Сохраняем предпочтение темы
         feedbackRepo.save(fb);
         return "thankyou";
     }
+
 
     @GetMapping("/api/adminold")
     public String adminOldPage(Model model) {
@@ -234,71 +251,4 @@ public class ExperimentController {
         return "adminold"; // соответствующий шаблон admin.html
     }
 
-//    @GetMapping("/api/admin")
-//    public String adminPage(Model model) {
-//        // 1. Загружаем всех пользователей
-//        List<UserDto> users = userRepo.findAll();
-//
-//        // 2. Загружаем все результаты
-//        List<UserTextResult> results = userTextResultRepo.findAll();
-//
-//        // 3. Создаём Map для быстрого доступа к пользователям по userId
-//        Map<Long, UserDto> userMap = users.stream()
-//                .collect(Collectors.toMap(UserDto::getId, u -> u));
-//
-//        // 4. Создаём Map для быстрого доступа к текстам по textId
-//        Map<Long, TextEntity> textMap = textRepo.findAll().stream()
-//                .collect(Collectors.toMap(TextEntity::getId, t -> t));
-//
-//        // 5. Создаём структуры для агрегирования данных
-//        // Map<userId, TotalCorrectAnswers>
-//        Map<Long, Integer> totalCorrectAnswersMap = new HashMap<>();
-//
-//        // Map<userId, CorrectAnswersInLightTheme>
-//        Map<Long, Integer> lightAnswersMap = new HashMap<>();
-//
-//        // Map<userId, CorrectAnswersInDarkTheme>
-//        Map<Long, Integer> darkAnswersMap = new HashMap<>();
-//
-//        for (UserTextResult r : results) {
-//            Long userId = r.getUserId();
-//            Long textId = r.getTextId();
-//            UserDto user = userMap.get(userId);
-//            TextEntity text = textMap.get(textId);
-//
-//            if (user != null && text != null) {
-//                boolean isGroupA = "A".equals(text.getGroupName());
-//                boolean conditionAIsLight = user.isConditionAIsLight();
-//
-//                // Определяем тему для данного текста
-//                boolean isLightTheme;
-//                if (isGroupA) {
-//                    isLightTheme = conditionAIsLight;
-//                } else {
-//                    isLightTheme = !conditionAIsLight;
-//                }
-//
-//                // Агрегируем общее количество правильных ответов
-//                totalCorrectAnswersMap.put(userId,
-//                        totalCorrectAnswersMap.getOrDefault(userId, 0) + r.getCorrectAnswersCount());
-//
-//                // Агрегируем по теме
-//                if (isLightTheme) {
-//                    lightAnswersMap.put(userId,
-//                            lightAnswersMap.getOrDefault(userId, 0) + r.getCorrectAnswersCount());
-//                } else {
-//                    darkAnswersMap.put(userId,
-//                            darkAnswersMap.getOrDefault(userId, 0) + r.getCorrectAnswersCount());
-//                }
-//            }
-//        }
-//
-//        // 6. Добавляем агрегированные данные в модель
-//        model.addAttribute("users", users);
-//        model.addAttribute("totalCorrectAnswersMap", totalCorrectAnswersMap);
-//        model.addAttribute("lightAnswersMap", lightAnswersMap);
-//        model.addAttribute("darkAnswersMap", darkAnswersMap);
-//
-//        return "admin"; // соответствующий шаблон admin.html
-//    }
 }
