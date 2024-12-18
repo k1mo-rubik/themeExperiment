@@ -10,16 +10,18 @@ import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
 public class UserDto {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id; // Заменяем Long на UUID
     private String nickname;
-    private String gender; 
+    private String gender;
     private Integer age;
-    private boolean conditionAIsLight; // true - А светлая, B темная; false - наоборот
+    private boolean conditionAIsLight;
+
 }
 

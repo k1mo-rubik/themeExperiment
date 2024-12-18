@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 
 @Entity
 @Getter
@@ -17,7 +19,7 @@ public class Feedback {
     private Long id;
 
     @Column(unique = true) // Добавляем уникальное ограничение
-    private Long userId;
+    private UUID userId;
 
     @Column(length = 2000)
     private String feedbackText;

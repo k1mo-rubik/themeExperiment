@@ -37,7 +37,7 @@ public class AnalyticsController {
         List<UserTextResult> results = userTextResultRepo.findAll();
         List<TextEntity> texts = textRepo.findAll();
 
-        Map<Long, UserDto> userMap = users.stream()
+        Map<UUID, UserDto> userMap = users.stream()
                 .collect(Collectors.toMap(UserDto::getId, u -> u));
 
         Map<Long, TextEntity> textMap = texts.stream()
@@ -50,7 +50,7 @@ public class AnalyticsController {
 
         // Агрегируем правильные ответы по темам
         for (UserTextResult r : results) {
-            Long userId = r.getUserId();
+            UUID userId = r.getUserId();
             Long textId = r.getTextId();
             UserDto user = userMap.get(userId);
             TextEntity text = textMap.get(textId);

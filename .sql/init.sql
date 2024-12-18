@@ -196,7 +196,7 @@ VALUES
 
 
 -- Вопросы к третьему тексту (id=3)
-INSERT INTO question (text_id, question_text, option1, option2, option3, option4 correct_option_index)
+INSERT INTO question (text_id, question_text, option1, option2, option3, option4, correct_option_index)
 VALUES
 (
   3,
